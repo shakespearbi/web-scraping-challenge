@@ -65,8 +65,10 @@ def scrape_info():
     weather_html = browser.html
     weather_soup = bs(weather_html, 'html.parser')
 
+    #find latest tweet
     mars_weather_text = weather_soup.find("p", class_="tweet-text").get_text()
 
+    #remove Papic.twitter.com/8235o0ln3B link
     mars_weather_text = mars_weather_text.strip("Papic.twitter.com/8235o0ln3B")
 
     #removing trailing newlines
