@@ -91,6 +91,32 @@ def scrape_info():
     separator = ""
     facts_table_html = separator.join(facts_list)
 
+    ## Mars Hemispheres
+    hem_url = "https://web.archive.org/web/20181114171728/https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    browser.visit(hem_url)
+    
+    time.sleep(1)
+
+    hem_html = browser.html
+    hem_soup = bs(hem_html, 'html.parser')
+
+    hemisphere_image_urls = []
+    links = browser.find_by_css("a.product-item h3")
+
+    for i in range(len(links)):
+        hemispheres = {}
+    
+        browser.find_by_css("a.product-item h3")[i].click()
+    
+        sample_el = browser.find_link_by_text('Sample').first
+        hemispheres['img_url'] = sample_el['href']
+                                
+        #hemispheres['title'] = browser.find("h2",class_="title").text
+        hemispheres['title'] = browser.find_by_css("h2.title").text
+    
+        hemisphere_image_urls.append(hemispheres)
+    
+        browser.back()  
 
     # Store data in a dictionary
     mars_data = {
@@ -99,7 +125,9 @@ def scrape_info():
         "featured_image_url": featured_image_url,
         "mars_weather": mars_weather,
         "mars_fact_table": facts_table_html,
+        "hemisphere_image_urls:" hemisphere_image_urls
     }
+
 
     # Close the browser after scraping
     browser.quit()
