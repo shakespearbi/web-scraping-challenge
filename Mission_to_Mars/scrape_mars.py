@@ -8,7 +8,7 @@ def init_browser():
     executable_path = {'executable_path': '/usr/local/bin/chromedriver'}
     return Browser("chrome", **executable_path, headless=False)
 
-def scrape_info():
+def scrape():
     browser = init_browser()
 
     ###NASA Mars News
@@ -33,7 +33,6 @@ def scrape_info():
 
     ####JPL Mars Space Images - Featured Image
     #visit https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars
-    browser = init_browser()
 
     images_url ='https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
     browser.visit(images_url) 
@@ -44,6 +43,7 @@ def scrape_info():
     button = browser.find_by_id('full_image').first
     button.click() 
     #click on more info
+    browser.is_element_present_by_text('more info',wait_time=2)
     browser.click_link_by_partial_text('more info')
 
     image_html = browser.html
@@ -57,7 +57,6 @@ def scrape_info():
     featured_image_url = base_url + image_url
 
     ### Mars Weather
-    browser = init_browser()
 
     tweet_url ='https://twitter.com/marswxreport?lang=en'
     browser.visit(tweet_url)
@@ -69,10 +68,11 @@ def scrape_info():
     mars_weather_text = weather_soup.find("p", class_="tweet-text").get_text()
 
     #remove Papic.twitter.com/8235o0ln3B link
-    mars_weather_text = mars_weather_text.strip("Papic.twitter.com/8235o0ln3B")
+    mars_weather_clean = mars_weather_text.strip("Papic.twitter.com/8235o0ln3B")
+    # mars_weather_clean = mars_weather_text[0]
 
     #removing trailing newlines
-    mars_weather_list = mars_weather_text.splitlines()
+    mars_weather_list = mars_weather_clean.splitlines()
     separator = " "
     mars_weather = separator.join(mars_weather_list)
 
@@ -91,10 +91,10 @@ def scrape_info():
     separator = ""
     facts_table_html = separator.join(facts_list)
 
-    ## Mars Hemispheres
+    # ## Mars Hemispheres
     hem_url = "https://web.archive.org/web/20181114171728/https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
     browser.visit(hem_url)
-    
+
     time.sleep(1)
 
     hem_html = browser.html
@@ -111,7 +111,6 @@ def scrape_info():
         sample_el = browser.find_link_by_text('Sample').first
         hemispheres['img_url'] = sample_el['href']
                                 
-        #hemispheres['title'] = browser.find("h2",class_="title").text
         hemispheres['title'] = browser.find_by_css("h2.title").text
     
         hemisphere_image_urls.append(hemispheres)
@@ -125,7 +124,7 @@ def scrape_info():
         "featured_image_url": featured_image_url,
         "mars_weather": mars_weather,
         "mars_fact_table": facts_table_html,
-        "hemisphere_image_urls:" hemisphere_image_urls
+        "hemisphere_image_urls": hemisphere_image_urls
     }
 
 
